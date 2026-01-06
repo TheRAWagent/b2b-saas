@@ -15,7 +15,7 @@ class AuthUser:
         return permission in self.org_permissions
 
     @property
-    def can_view_org(self) -> bool:
+    def can_view(self) -> bool:
         return self.has_permission("org:tasks:view")
 
     @property
@@ -42,7 +42,7 @@ async def get_current_user(request: fastapi.Request) -> AuthUser:
 
     claims = request_state.payload
     user_id = claims.get("sub")
-    org_id = claims.get("org")
+    org_id = claims.get("org_id")
     org_permissions = claims.get("permissions") or claims.get("org_permissions") or []
 
     if not user_id:

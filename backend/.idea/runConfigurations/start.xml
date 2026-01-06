@@ -5,10 +5,10 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
-      <env name="PYTHONUNBUFFERED" value="1" />
       <env name="CLERK_JWKS_URL" value="https://unbiased-corgi-14.clerk.accounts.dev/.well-known/jwks.json" />
       <env name="CLERK_PUBLISHABLE_KEY" value="pk_test_dW5iaWFzZWQtY29yZ2ktMTQuY2xlcmsuYWNjb3VudHMuZGV2JA" />
       <env name="CLERK_SECRET_KEY" value="sk_test_EEjjWwNssBbVTrkdTBKwLlTbaOgIL2YQFsMMqj0guf" />
+      <env name="FRONTEND_URL" value="http://localhost:5173" />
     </envs>
     <option name="SDK_HOME" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
