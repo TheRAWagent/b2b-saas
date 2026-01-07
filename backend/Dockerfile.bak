@@ -1,0 +1,51 @@
+# syntax=docker/dockerfile:1
+
+FROM python:3.12-slim AS base
+
+# Builder stage: install uv, create venv, install dependencies
+FROM base AS builder
+
+# Install system dependencies for building wheels (psycopg2-binary, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install uv (prebuilt binary)
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Copy dependency files only for cache efficiency
+COPY --link pyproject.toml ./
+COPY --link uv.lock ./
+
+# Create venv and install dependencies using uv
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv venv && \
+    ENV PATH="/app/.venv/bin:$PATH" uv pip install -r pyproject.toml
+
+# Copy application code (excluding .env, .git, .venv, IDE, etc.)
+COPY --link app/ ./app/
+COPY --link start.py ./
+
+# Final stage: minimal image, non-root user
+FROM base AS final
+
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup --system appuser && adduser --system --ingroup appuser appuser
+
+# Copy venv and app code from builder
+COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/app /app/app
+COPY --from=builder /app/start.py /app/start.py
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["python", "start.py"]
